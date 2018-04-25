@@ -1,8 +1,18 @@
 const fs = require('fs');
 
+
 // Module variables
 var data = {};
 var datafile = "";
+
+// function handleRequest(req, res) {  
+//   if(req.method === 'POST' && req.url === '/courses') {
+//     return createCourse(req, res);
+//   } else {
+//     res.statusCode = 400;
+//     res.end("Not implemented");
+//   }
+// }
 
 /** @function handleRequest
   * This function maps incoming requests to
@@ -11,13 +21,10 @@ var datafile = "";
   * @param {http.clientRequest} req - the incoming request
   * @param {http.serverResponse} res - the response to serve
   */
-function handleRequest(req, res) {
-  if(req.method === 'POST' && req.url === '/courses') {
-    return createCourse(req, res);
-  } else {
-    res.statusCode = 400;
-    res.end("Not implemented");
-  }
+function handleRequest(app) {  
+  app.get("/courses", function(req, res) {
+    res.status(200).send("Welcome to our RESTful API");
+  });
 }
 
 function createCourse(req, res) {

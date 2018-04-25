@@ -12,5 +12,9 @@
   "devDependencies": {
     "jest": "^22.4.3",
     "require": "^2.4.20"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3"
   }
 }

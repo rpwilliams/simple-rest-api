@@ -49,35 +49,34 @@ function handleRequest(app) {
 
   app.post("/courses", function(req, res) {
     var body = req.body;
+    var name = body.name;
 
     // var nameReg = new RegExp("[^-]*");
     // var idReg = nameReg.exec(body.name);
     // if(!idReg){
     //   res.status(500).send('ID not there!');
     // }
-    // var id = idReg[0].replace(/\s+/g, '');;
-    var id = body.name;
-    id = JSON.stringify(id).replace(/\//g, '');
-    console.log(id);
-    data['courses'][id] = body;
-    console.log(data['courses'][id]);
-    save();
-    res.send(JSON.stringify(body));
+    // var id = idReg[0].replace(/\s+/g, '');
+    try{
+      var tokens = name.split(" ");
 
+      /* Throw an error if less than 2 words */
+      if(tokens.length < 2) {
+        res.statusCode = 422;
+        res.end("Poorly formatted course entry");
+        return;
+      }
 
-    /* Add a new course */
-    // var course = {  
-    //   name: name,
-    //   desc: desc,
-    //   requisites: prereqs,
-    //   typicallyOffered: typOff,
-    //   kState8: kState8    
-    // };
-    // data["course"][id] = course;
-
-    // createCourse(req, res);
-    // data["courses"][id] = id;
-    // save();
+      var id = tokens[0] + tokens[1];
+      data['courses'][id] = body;
+      save();
+      res.statusCode(200).send(JSON.stringify(body));
+    }
+    catch(err) {
+      console.error(err);
+      res.statusCode = 500;
+      res.end("Server Error: " + err);
+    }
   });
 }
 
@@ -98,7 +97,7 @@ function load(filename) {
   * Saves the data to the persistent file
   */
 function save() {
-  console.log(data);
+  // console.log(data);
   fs.writeFileSync(datafile, JSON.stringify(data));
 }
 

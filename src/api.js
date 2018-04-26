@@ -5,26 +5,16 @@ const fs = require('fs');
 var data = {};
 var datafile = "";
 
-// function handleRequest(req, res) {  
-//   if(req.method === 'POST' && req.url === '/courses') {
-//     return createCourse(req, res);
-//   } else {
-//     res.statusCode = 400;
-//     res.end("Not implemented");
-//   }
-// }
 
 /** @function handleRequest
   * This function maps incoming requests to
   * API calls.
-  * TODO set up mapping.
   * @param {http.clientRequest} req - the incoming request
   * @param {http.serverResponse} res - the response to serve
   */
 function handleRequest(app) {  
-  /* READ ALL courses as a JSON object */
+  /* READ all courses as a JSON object */
   app.get("/courses", function(req, res) {
-
     try {
       var courses = data['courses'];
       res.status(200).send(JSON.stringify(Object.values(courses)));
@@ -56,8 +46,6 @@ function handleRequest(app) {
     var body = req.body;
     var name = body.name;
 
-    console.log(req.body.credits);
-
     try{
         
         /* Get the two words that make the name. 
@@ -72,9 +60,9 @@ function handleRequest(app) {
         }
 
         var id = tokens[0] + tokens[1];
-        data['courses'][id] = body;
-        save();
-        res.statusCode(200).send(JSON.stringify(body));
+        data['courses'][id] = body; // Update the JSON object
+        save(); // Save the JSON object
+        res.status(200).send(JSON.stringify(body));
     }
     catch(err) {
       console.error(err);
@@ -88,7 +76,7 @@ function handleRequest(app) {
     var body = req.body;
 
     try {
-      /* Find a course with the corresponding ID */
+      /* Find and update a course with the corresponding ID */
       data['courses'][req.params.id] = body; 
       save();
       res.status(200).send(JSON.stringify(body));
@@ -105,7 +93,7 @@ function handleRequest(app) {
     var body = req.body;
 
     try {
-      /* Find a course with the corresponding ID */
+      /* Find and delete a course with the corresponding ID */
       delete data['courses'][req.params.id]; 
       save();
       res.status(200).send(JSON.stringify(body));

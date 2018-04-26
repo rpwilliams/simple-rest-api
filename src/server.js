@@ -8,6 +8,7 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+/* Router */
 api.handleRequest(app);
 
 // Module variables

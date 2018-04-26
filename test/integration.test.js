@@ -74,6 +74,7 @@ test('GET /courses/:id should return specified class', function(done){
   request(HOST + '/courses/one', function(error, response, body){
     expect(error).toBeNull();
     expect(body).toEqual(JSON.stringify(DATA["courses"]["one"]));
+    done();
   });
 });
 

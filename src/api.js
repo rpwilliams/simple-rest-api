@@ -22,55 +22,93 @@ var datafile = "";
   * @param {http.serverResponse} res - the response to serve
   */
 function handleRequest(app) {  
-  /* GET ALL courses */
+  /* READ ALL courses as a JSON object */
   app.get("/courses", function(req, res) {
-    req.on('error', function(err) {
+
+    try {
+      var courses = data['courses'];
+      res.status(200).send(JSON.stringify(Object.values(courses)));
+    }
+    catch(err) {
       console.error(err);
       res.statusCode = 500;
-      res.end("Server Error");
-    });
-
-    var courses = data['courses'];
-    res.status(200).send(JSON.stringify(Object.values(courses)));
+      res.end("Server Error: " + err);
+    }
   });
 
-  /* GET a specific course */
+  /* READ a specific course as a JSON object */
   app.get("/courses/:id", function(req, res) {
-      req.on('error', function(err) {
+      var courseID = req.params.id;
+
+      try {      
+        var course = data["courses"][courseID];
+        res.status(200).send(course);
+      }
+      catch(err) {
         console.error(err);
         res.statusCode = 500;
-        res.end("Server Error");
-      });
-
-      var courseID = req.params.id;
-      var course = data["courses"][courseID];
-      res.status(200).send(course);
+        res.end("Server Error: " + err);
+      }
   });
 
+  /* CREATE a new course from the JSON body of the request */
   app.post("/courses", function(req, res) {
     var body = req.body;
     var name = body.name;
 
-    // var nameReg = new RegExp("[^-]*");
-    // var idReg = nameReg.exec(body.name);
-    // if(!idReg){
-    //   res.status(500).send('ID not there!');
-    // }
-    // var id = idReg[0].replace(/\s+/g, '');
+    console.log(req.body.credits);
+
     try{
-      var tokens = name.split(" ");
+        
+        /* Get the two words that make the name. 
+        These two words will be the ID */
+        var tokens = name.split(" ");
 
-      /* Throw an error if less than 2 words */
-      if(tokens.length < 2) {
-        res.statusCode = 422;
-        res.end("Poorly formatted course entry");
-        return;
-      }
+        /* Throw an error if less than 2 words */
+        if(tokens.length < 2) {
+          res.statusCode = 422;
+          res.end("Poorly formatted course entry");
+          return;
+        }
 
-      var id = tokens[0] + tokens[1];
-      data['courses'][id] = body;
+        var id = tokens[0] + tokens[1];
+        data['courses'][id] = body;
+        save();
+        res.statusCode(200).send(JSON.stringify(body));
+    }
+    catch(err) {
+      console.error(err);
+      res.statusCode = 500;
+      res.end("Server Error: " + err);
+    }
+  });
+
+  /* UPDATE a new course from the JSON body of the request */
+  app.put("/courses/:id", function(req, res) {
+    var body = req.body;
+
+    try {
+      /* Find a course with the corresponding ID */
+      data['courses'][req.params.id] = body; 
       save();
-      res.statusCode(200).send(JSON.stringify(body));
+      res.status(200).send(JSON.stringify(body));
+    }
+    catch(err) {
+      console.error(err);
+      res.statusCode = 500;
+      res.end("Server Error: " + err);
+    }
+  });
+
+  /* DELETE course specified */
+  app.delete("/courses/:id", function(req, res) {
+    var body = req.body;
+
+    try {
+      /* Find a course with the corresponding ID */
+      delete data['courses'][req.params.id]; 
+      save();
+      res.status(200).send(JSON.stringify(body));
     }
     catch(err) {
       console.error(err);
@@ -80,9 +118,6 @@ function handleRequest(app) {
   });
 }
 
-function removeBackslashes(jsonString) {
-
-}
 
 /** @function load
   * Loads the persistent data file
